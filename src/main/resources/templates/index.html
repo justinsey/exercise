@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lunatech Exercise</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/css/angular-material.min.css}" type="text/css">
+</head>
+
+<body ng-controller="mainController" ng-app="lunatechExercise">
+<div layout="column" ng-cloak="" class="autocompletedemoBasicUsage">
+    <md-content class="md-padding">
+        <md-autocomplete md-selected-item="selectedItem"
+                         md-search-text="searchText"
+                         md-selected-item-change="selectedItemChange(item)"
+                         md-items="item in querySearch(searchText)"
+                         md-item-text="item.name"
+                         md-min-length="0"
+                         placeholder="Type a country to show airports and runways?">
+            <md-item-template>
+                <span md-highlight-text="ctrl.searchText" md-highlight-flags="^i">{{item.code}} - {{item.name}}</span>
+            </md-item-template>
+            <md-not-found>
+                No country matching "{{searchText}}" were found.
+            </md-not-found>
+        </md-autocomplete>
+    </md-content>
+</div>
+<div class="demo-blog mdl-layout mdl-js-layout has-drawer is-upgraded">
+    <main ng-if="paging.total > 0" class="mdl-layout__content">
+        <div class="demo-blog__posts mdl-grid">
+            <md-content layout="column" flex="flex" tabindex="0" class="md-default-theme">
+                <md-table class="ng-isolate-scope">
+                    <table md-colresize="md-colresize" class="md-table">
+                        <thead>
+                        <tr class="md-table-headers-row">
+                            <th class="md-table-header"></th>
+                            <th class="md-table-header">Identifier</th>
+                            <th class="md-table-header">Type</th>
+                            <th class="md-table-header">Name</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="airport in airports" class="md-table-content-row"
+                            ng-click="showTabDialog($event, airport)">
+                            <td class="md-table-content">{{airport.id}}</td>
+                            <td class="md-table-content">{{airport.ident}}</td>
+                            <td class="md-table-content">{{airport.type}}</td>
+                            <td class="md-table-content">{{airport.name}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </md-table>
+
+                <div layout>
+                    <div layout="column" flex="flex"></div>
+                    <div ng-if="paging.total > 1" layout="column" layout-padding="">
+                        <cl-paging flex cl-pages="paging.total" , cl-steps="6" , cl-page-changed="paging.onPageChanged()" ,
+                                   cl-align="start start" , cl-current-page="paging.current"></cl-paging>
+                    </div>
+                </div>
+
+            </md-content>
+        </div>
+
+    </main>
+
+</div>
+
+<script type="text/ng-template" id="runwaysDialog.tmpl.html">
+    <md-dialog>
+        <form>
+            <md-toolbar>
+                <div class="md-toolbar-tools">
+                    <h2>{{airport.name}}</h2>
+                    <span flex></span>
+                    <md-button class="md-icon-button" ng-click="cancel()">
+                        <md-icon md-svg-icon="md-close" aria-label="Close dialog"></md-icon>
+                    </md-button>
+                </div>
+            </md-toolbar>
+            <md-dialog-content style="max-width:1200px; min-width:1200px; max-height:600px; ">
+                <div layout>
+                    <md-content layout="column" flex="66" class="md-padding">
+                        <h1 class="md-display-2">Runways for {{airport.ident}}</h1>
+                        <table ng-if="runways.length > 0" class="md-table">
+                            <thead>
+                            <tr class="md-table-headers-row">
+                                <th class="md-table-header"></th>
+                                <th class="md-table-header">Airport reference</th>
+                                <th class="md-table-header">Surface</th>
+                                <th class="md-table-header">LE Identifier</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="runway in runways" class="md-table-content-row">
+                                <td class="md-table-content">{{runway.id}}</td>
+                                <td class="md-table-content">{{runway.airport_ref}}</td>
+                                <td class="md-table-content">{{runway.surface}}</td>
+                                <td class="md-table-content">{{runway.le_ident}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <p ng-if="runways.length == 0">No runways found for this Airport</p>
+                    </md-content>
+                    <div layout="column" flex="33">
+                        <div class="map-container">
+                            <ui-gmap-google-map center="map.center" zoom="map.zoom">
+                                <ui-gmap-marker coords="map.center" idkey="0">
+                                </ui-gmap-marker>
+                            </ui-gmap-google-map>
+                        </div>
+                    </div>
+                </div>
+
+            </md-dialog-content>
+
+            <md-dialog-actions layout="row">
+                <span flex></span>
+                <md-button ng-click="cancel()" style="margin-right:20px;">Close</md-button>
+            </md-dialog-actions>
+        </form>
+    </md-dialog>
+</script>
+</body>
+
+<script th:src="@{/lib/angularjs/1.5.8/angular.min.js}"></script>
+<script th:src="@{/lib/angularjs/1.5.8/angular-animate.min.js}"></script>
+<script th:src="@{/lib/angularjs/1.5.8/angular-aria.min.js}"></script>
+<script th:src="@{/lib/angularjs/1.5.8/angular-messages.min.js}"></script>
+<script th:src="@{/lib/angular-material/1.1.0-rc2/angular-material.min.js}"></script>
+<script th:src="@{/lib/lodash/4.15.0/lodash.min.js}"></script>
+<script th:src="@{/lib/restangular/1.5.2/restangular.min.js}"></script>
+<script th:src="@{/lib/angular-simple-logger/angular-simple-logger.min.js}"></script>
+<script th:src="@{/lib/angular-google-maps/2.3.4/angular-google-maps.min.js}"></script>
+<script th:src="@{/lib/angular-material-paging/master/dist.min.js}"></script>
+<script th:src="@{/js/application.js}"></script>
+<script th:src="@{/js/home/home.controller.js}"></script>
+</html>
